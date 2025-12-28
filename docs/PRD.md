@@ -201,7 +201,7 @@ Admins can:
 - Razorpay
 
 **Market Data:**
-- Zerodha / TrueData / Fyers
+- Zerodha / TrueData / Fyers /
 
 **Hosting:**
 - Vercel (FE)
