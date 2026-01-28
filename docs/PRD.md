@@ -25,55 +25,71 @@ TradeLens staff.
 - **name**
 - **photo**
 - **bio**
-- **markets**
-- **strategy**
-- **SEBI_status** (verified / unverified)
+- **instruments** (CASH_EQUITY, STOCK_FUTURES, STOCK_OPTIONS, INDEX_FUTURES, INDEX_OPTIONS, COMMODITIES, CURRENCY_DERIVATIVES)
+- **strategies** (INTRADAY, SWING, POSITIONAL, OPTIONS_SELLING, OPTIONS_BUYING, SCALPING, TREND_FOLLOWING, MEAN_REVERSION, EVENT_BASED)
+- **SEBI_status** (VERIFIED / UNVERIFIED)
 - **SEBI_reg_no**
-- **risk_profile**
-- **capital_required**
-- **pricing**
-- **performance_stats**
-- **payout_wallet**
+- **risk_profile** (LOW, MEDIUM, HIGH)
+- **capital_required_bucket** (SMALL, MEDIUM, LARGE)
+- **joined_at**
 
 ### Member
 - **id**
 - **email**
-- **active_access_plans**
-- **joined_trades**
-- **personal_trade_performance**
+- **joined_at**
 
-### Trade Idea
+### TradeIdea
 - **id**
 - **creator_id**
+- **instrument_type** (INDEX_OPTIONS, CASH_EQUITY, etc)
 - **symbol**
 - **entry**
 - **objective**
 - **risk_limit**
 - **expiry**
 - **thesis** (markdown)
-- **timestamp**
-- **status** (active / reached / invalidated / expired)
+- **published_at**
+- **status** (ACTIVE, REACHED, INVALIDATED, EXPIRED)
 
-### Access Plan
+### AccessPlan
+- **id**
 - **creator_id**
+- **name** (Monthly, Quarterly, Pro, etc)
 - **price**
-- **duration**
-- **active_members**
+- **billing_cycle** (MONTHLY, QUARTERLY)
+- **is_active**
+- **created_at**
 
 ### Subscription
+- **id**
 - **member_id**
-- **creator_id**
-- **start**
-- **end**
-- **status**
+- **access_plan_id**
+- **start_at**
+- **end_at**
+- **status** (ACTIVE, CANCELLED, EXPIRED)
 
-### Trade Outcome
+### TradeOutcome
+- **id**
 - **trade_id**
-- **entry_hit**
+- **entry_hit_at**
 - **exit_price**
-- **outcome**
+- **outcome** (REACHED, INVALIDATED, EXPIRED)
 - **pnl**
 - **validated_at**
+
+### CreatorWallet
+- **creator_id**
+- **pending_balance**
+- **available_balance**
+- **lifetime_earned**
+
+### Payout
+- **id**
+- **creator_id**
+- **amount**
+- **status** (PENDING, COMPLETED, FAILED)
+- **requested_at**
+- **processed_at**
 
 ### Member Features
 
@@ -81,12 +97,15 @@ TradeLens staff.
 Members can:
 - Search creators
 - Filter by:
-    - Market
+    - Instruments
     - Risk
-    - Capital
-    - Price
+    - Strategy
+    - Capital(ranges)
+    - Subscription Price
     - SEBI status
     - Performance
+    - Holding period
+    - Performance (30d, 90d, all-time)
 
 #### B. Creator Profile
 Shows:
@@ -94,7 +113,7 @@ Shows:
 - Strategy
 - SEBI status
 - Performance stats
-- Pricing
+- Access Plans
 - Reviews
 - **Get Access** button
 
@@ -135,11 +154,13 @@ Creators must submit:
 
 Once published:
 - **Cannot be edited**
+- **Creator can add follow-up comments**
 
 #### C. Screenshot & Leak Protection
 - User-specific watermark on every trade
-- Copy protection
-- Trade locks after expiry
+- Blurred view on tab switch
+- Disabled text selection
+- Screenshot warning (where supported)
 
 #### D. Performance Dashboard
 Creators see:
@@ -155,6 +176,7 @@ Creators see:
 - Withdraw history
 - Withdraw button
 - **Funds unlock after 7 days.**
+- **Negative balance allowed (to handle refunds & chargebacks)**
 
 ### 5. Payments & Payouts
 - Razorpay handles all payments
