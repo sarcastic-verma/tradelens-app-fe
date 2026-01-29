@@ -13,7 +13,7 @@ export class UserRepository {
   }
 
   static doSocialAuth(token: string) {
-    return axios.post(
+    return axios.post<{ user: BackendUser, exists: boolean }>(
       "/api/users/social",
       {},
       { headers: { Authorization: `Bearer ${token}` } },

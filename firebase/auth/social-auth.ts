@@ -27,7 +27,7 @@ const baseSocialAuth = async (
 
     const response = await UserRepository.doSocialAuth(temporaryToken);
 
-    const data = response.data as { user: BackendUser; exists: boolean };
+    const data = response.data;
     await setIdToken(authResult.user);
 
     setLoggedInUser(data.user);
@@ -56,7 +56,7 @@ const baseSocialAuth = async (
 
           const response = await UserRepository.doSocialAuth(temporaryToken);
 
-          const data = response.data as { user: BackendUser; exists: boolean };
+          const data = response.data;
           await setIdToken(authResult.user);
 
           setLoggedInUser(data.user);

@@ -18,8 +18,10 @@ Each domain must be isolated:
 - payments
 - performance
 
-No domain may import another domain’s database models directly.
-They must use services.
+All backend API calls must be added in repositories
+folders. 
+
+For other API calls please add in integrations folder.
 
 ## Naming
 
