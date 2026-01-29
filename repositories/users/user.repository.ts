@@ -14,7 +14,7 @@ export class UserRepository {
 
   static doSocialAuth(token: string) {
     return axios.post(
-      "/api/auth/social",
+      "/api/users/social",
       {},
       { headers: { Authorization: `Bearer ${token}` } },
     );
