@@ -6,9 +6,8 @@ import { useRouter } from "next/navigation";
 import { appleAuth, googleAuth } from "@/firebase/auth/social-auth";
 import { useAuthContext } from "@/state/context/auth.context";
 import { useLoading } from "@/state/context/loading.context";
-
-import AppleLogo from "../../../public/icons/apple-logo.svg";
-import GoogleLogo from "../../../public/icons/google-logo.svg";
+import AppleLogo from "@/public/icons/apple-logo.svg";
+import GoogleLogo from "@/public/icons/google-logo.svg";
 
 export const SocialButton = ({
   authType,
@@ -27,9 +26,11 @@ export const SocialButton = ({
     <button
       type="button"
       onClick={async () => {
+        console.log("clicked");
         const exists = await authFxn(firebaseUser, router, setUser, setLoading);
 
-        router.push(exists ? "/" : "/onboarding");
+        console.log("exists", exists);
+        // router.push(exists ? "/" : "/onboarding");
       }}
       className="flex items-center justify-center w-[70%] p-2 bg-white rounded-3xl focus:outline-none hover:ring-1 hover:ring-gray-700"
     >

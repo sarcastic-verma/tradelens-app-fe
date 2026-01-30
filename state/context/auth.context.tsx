@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import {
   getAuth,
   onAuthStateChanged,
-  signInAnonymously,
   User,
 } from "firebase/auth";
 
@@ -51,13 +50,7 @@ export const AuthContextProvider = ({
   }, []);
 
   useEffect(() => {
-    const idToken = localStorage.getItem("idToken");
-
     (async () => {
-      if (!idToken) {
-        await signInAnonymously(auth);
-      }
-
       if (user === null && !!firebaseUser) {
         const user = await UserRepository.getMe();
         setUser(user.data);

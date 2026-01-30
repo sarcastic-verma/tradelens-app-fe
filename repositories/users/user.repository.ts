@@ -1,4 +1,3 @@
-import axios from "axios";
 import { BackendUser } from "../../types";
 import { UpdateUserDto } from "../../types/users";
 import { axiosInstance } from "../../utils/axios-instance";
@@ -13,7 +12,7 @@ export class UserRepository {
   }
 
   static doSocialAuth(token: string) {
-    return axios.post<{ user: BackendUser, exists: boolean }>(
+    return axiosInstance.post<{ user: BackendUser; exists: boolean }>(
       "/api/users/social",
       {},
       { headers: { Authorization: `Bearer ${token}` } },

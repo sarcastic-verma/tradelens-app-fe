@@ -2,9 +2,9 @@ import React from "react";
 import { FirebaseError } from "firebase/app";
 import {
   AuthProvider,
-  linkWithPopup,
   OAuthProvider,
   signInWithCredential,
+  signInWithPopup,
   User,
 } from "firebase/auth";
 import { setIdToken } from "@/firebase/auth/common";
@@ -21,7 +21,7 @@ const baseSocialAuth = async (
   setLoading: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
   try {
-    const authResult = await linkWithPopup(user!, provider);
+    const authResult = await signInWithPopup(firebaseAuth, provider);
     setLoading(true);
     const temporaryToken = await authResult.user.getIdToken();
 
@@ -35,6 +35,7 @@ const baseSocialAuth = async (
 
     return data.exists;
   } catch (e) {
+    console.log(e);
     try {
       if (
         (e as FirebaseError)
