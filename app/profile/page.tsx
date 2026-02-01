@@ -14,7 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { LogOut, Upload, Camera, Loader2 } from "lucide-react";
+import { LogOut, Upload, Loader2 } from "lucide-react";
 import { BackendUser } from "@/types";
 import { Loading } from "@/components/common/loading";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";

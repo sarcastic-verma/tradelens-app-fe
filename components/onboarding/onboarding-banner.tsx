@@ -3,22 +3,18 @@
 import { useAuthContext } from "@/state/context/auth.context";
 import { useRouter } from "next/navigation";
 import { X, ArrowRight } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 
 export const OnboardingBanner = () => {
   const { user, loading } = useAuthContext();
   const router = useRouter();
-  const [isVisible, setIsVisible] = useState(false);
+  const [isDismissed, setIsDismissed] = useState(false);
 
-  useEffect(() => {
-    if (!loading && user && !user.name) {
-      setIsVisible(true);
-    }
-  }, [user, loading, router]);
+  // Derived state - no effect needed
+  const shouldShow = !loading && user && !user.name && !isDismissed;
 
-  if (!isVisible) return null;
+  if (!shouldShow) return null;
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 p-4 animate-slide-up">
@@ -52,7 +48,7 @@ export const OnboardingBanner = () => {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => setIsVisible(false)}
+                onClick={() => setIsDismissed(true)}
                 className="shrink-0 text-muted-foreground hover:text-foreground hover:bg-white/5"
               >
                 <X className="h-5 w-5" />
