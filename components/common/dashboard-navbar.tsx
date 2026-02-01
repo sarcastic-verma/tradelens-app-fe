@@ -8,7 +8,7 @@ export function DashboardNavbar() {
   const { user, loading } = useAuthContext();
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 flex flex-col items-center pt-4 px-4 bg-transparent pointer-events-none">
+    <header className="fixed top-0 left-0 right-0 z-50 hidden md:flex flex-col items-center pt-4 px-4 bg-transparent pointer-events-none">
       <nav className="flex items-center justify-between h-16 px-4 bg-background/90 backdrop-blur-xl border border-border/50 rounded-full shadow-lg max-w-2xl w-full pointer-events-auto transition-all duration-300">
         <div className="flex items-center gap-2 sm:gap-3 ml-2">
           <div className="flex flex-col items-start leading-none gap-0.5">

@@ -2,6 +2,7 @@
 
 import React from "react";
 import { DashboardNavbar } from "@/components/common/dashboard-navbar";
+import { MobileNavbar } from "@/components/common/mobile-navbar";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -35,7 +36,7 @@ export const DashboardLayout = ({
 
       {/* Main Content */}
       <main
-        className={`container ${maxWidthClass} mx-auto pt-32 px-4 pb-20 relative z-10`}
+        className={`container ${maxWidthClass} mx-auto pt-6 md:pt-32 px-4 pb-28 md:pb-20 relative z-10`}
       >
         {(title || description) && (
           <div className="mb-10 animate-fade-in">
@@ -52,6 +53,9 @@ export const DashboardLayout = ({
 
         <div className="animate-fade-in">{children}</div>
       </main>
+
+      {/* Mobile Bottom Navigation */}
+      <MobileNavbar />
     </div>
   );
 };
