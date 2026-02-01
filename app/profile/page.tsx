@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useAuthContext } from "@/state/context/auth.context";
@@ -14,91 +14,209 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { LogOut } from "lucide-react";
+import { LogOut, Upload, Camera, Loader2 } from "lucide-react";
 import { BackendUser } from "@/types";
 import { Loading } from "@/components/common/loading";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
+import { UserRepository } from "@/repositories/users/user.repository";
 
 interface ProfileFormProps {
   user: BackendUser;
   logout: () => void;
+  setUser: (user: BackendUser | null) => void;
 }
 
-function ProfileForm({ user, logout }: ProfileFormProps) {
+function ProfileForm({ user, logout, setUser }: ProfileFormProps) {
   const router = useRouter();
-  // Initialize state with user data directly - safest since component only mounts when user exists
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [name, setName] = useState(user.name || "");
+  const [phone, setPhone] = useState(user.phone || "");
+  const [profilePicFile, setProfilePicFile] = useState<File | null>(null);
+  const [profilePicPreview, setProfilePicPreview] = useState<string | null>(
+    null,
+  );
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Sync state if user prop updates (e.g. initial load or external update)
+  useEffect(() => {
+    if (user) {
+      setName(user.name || "");
+      setPhone(user.phone || "");
+    }
+  }, [user]);
 
   const handleLogout = async () => {
     await logout();
     router.push("/");
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setProfilePicFile(file);
+      const objectUrl = URL.createObjectURL(file);
+      setProfilePicPreview(objectUrl);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) return;
+
+    setIsSubmitting(true);
+    try {
+      let finalProfilePic = user.profilePic;
+
+      // 1. Upload Image to S3 if selected
+      if (profilePicFile) {
+        const { data: presigned } = await UserRepository.getPresignedUrl(
+          profilePicFile.type,
+        );
+
+        await fetch(presigned.url, {
+          method: "PUT",
+          body: profilePicFile,
+          headers: {
+            "Content-Type": profilePicFile.type,
+          },
+        });
+
+        // Construct public URL using the key
+        finalProfilePic = `https://tradelens-s3.s3.ap-south-1.amazonaws.com/${presigned.key}`;
+      }
+
+      // 2. Update User
+      const { data: updatedUser } = await UserRepository.updateMe({
+        name,
+        phone,
+        profilePic: finalProfilePic,
+      });
+
+      setUser(updatedUser);
+      // Clean up preview
+      if (profilePicPreview) {
+        URL.revokeObjectURL(profilePicPreview);
+        setProfilePicPreview(null);
+        setProfilePicFile(null);
+      }
+
+      // Correct way to show success? Maybe a toast later.
+    } catch (error) {
+      console.error("Failed to update profile", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="space-y-8 animate-fade-in">
-      {/* User Profile Card */}
-      <Card className="glass-card overflow-hidden shadow-elevated">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none" />
-        <CardHeader className="relative z-10 border-b border-border/40 pb-6">
-          <CardTitle className="text-2xl font-semibold">
-            Profile Information
-          </CardTitle>
-          <CardDescription>Manage your personal details</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-8 pt-8 relative z-10">
-          <div className="flex flex-col md:flex-row items-start gap-8">
-            <div className="relative group shrink-0 mx-auto md:mx-0">
-              <div className="absolute -inset-1 bg-gradient-to-br from-primary to-blue-600 rounded-full blur opacity-20 group-hover:opacity-40 transition-opacity" />
-              {user.photo ? (
-                <Image
-                  src={user.photo}
-                  alt="Profile"
-                  width={100}
-                  height={100}
-                  className="relative rounded-full border-2 border-background shadow-lg"
-                />
-              ) : (
-                <div className="relative w-24 h-24 rounded-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-white text-3xl font-bold border-2 border-background shadow-lg">
-                  {(user.name || user.email || "U")[0].toUpperCase()}
+      <form onSubmit={handleSubmit} className="space-y-8">
+        {/* User Profile Card */}
+        <Card className="glass-card overflow-hidden shadow-elevated">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none" />
+          <CardHeader className="relative z-10 border-b border-border/40 pb-6">
+            <CardTitle className="text-2xl font-semibold">
+              Profile Information
+            </CardTitle>
+            <CardDescription>Manage your personal details</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-8 pt-8 relative z-10">
+            <div className="flex flex-col md:flex-row items-start gap-8">
+              {/* Profile Picture Section */}
+              <div className="relative group shrink-0 mx-auto md:mx-0">
+                <div className="absolute -inset-1 bg-gradient-to-br from-primary to-blue-600 rounded-full blur opacity-20 group-hover:opacity-40 transition-opacity" />
+                <div
+                  className="relative w-28 h-28 rounded-full bg-secondary/30 border-2 border-dashed border-border flex items-center justify-center cursor-pointer overflow-hidden group hover:border-primary transition-all duration-300 shadow-lg"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  {profilePicPreview || user.profilePic ? (
+                    <Image
+                      src={profilePicPreview || user.profilePic || ""}
+                      alt="Profile"
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                  ) : (
+                    <div className="relative w-full h-full flex items-center justify-center bg-gradient-to-br from-primary to-blue-600 text-white text-3xl font-bold">
+                      {(user.name || user.email || "U")[0].toUpperCase()}
+                    </div>
+                  )}
+
+                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+                    <Upload className="w-8 h-8 text-white drop-shadow-md" />
+                  </div>
                 </div>
-              )}
-            </div>
-
-            <div className="flex-1 w-full space-y-6">
-              <div className="grid gap-2">
-                <label className="text-sm font-medium text-muted-foreground">
-                  Display Name
-                </label>
-                <Input
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Your Name"
-                  className="bg-secondary/30 border-border/50 focus:border-primary/50 focus:ring-primary/20 h-11"
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  accept="image/*"
+                  className="hidden"
                 />
               </div>
-              <div className="grid gap-2">
-                <label className="text-sm font-medium text-muted-foreground">
-                  Email Address
-                </label>
-                <Input
-                  value={user.email || ""}
-                  disabled
-                  className="bg-muted/50 text-muted-foreground border-transparent h-11"
-                />
+
+              <div className="flex-1 w-full space-y-6">
+                <div className="grid gap-2">
+                  <label className="text-sm font-medium text-muted-foreground">
+                    Display Name
+                  </label>
+                  <Input
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Your Name"
+                    className="bg-secondary/30 border-border/50 focus:border-primary/50 focus:ring-primary/20 h-11"
+                  />
+                </div>
+
+                <div className="grid gap-2">
+                  <label className="text-sm font-medium text-muted-foreground">
+                    Phone Number
+                  </label>
+                  <Input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="+91 9123456789"
+                    className="bg-secondary/30 border-border/50 focus:border-primary/50 focus:ring-primary/20 h-11"
+                  />
+                </div>
+
+                <div className="grid gap-2">
+                  <label className="text-sm font-medium text-muted-foreground">
+                    Email Address
+                  </label>
+                  <Input
+                    value={user.email || ""}
+                    disabled
+                    className="bg-muted/50 text-muted-foreground border-transparent h-11"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Email cannot be changed.
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="flex justify-end pt-4">
-            <Button
-              variant="default"
-              className="w-full sm:w-auto shadow-glow-primary"
-            >
-              Save Changes
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+            <div className="flex justify-end pt-4">
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full sm:w-auto shadow-glow-primary"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  "Save Changes"
+                )}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </form>
 
       <div className="grid gap-6 md:grid-cols-2">
         {/* Preferences Card */}
@@ -145,7 +263,7 @@ function ProfileForm({ user, logout }: ProfileFormProps) {
 }
 
 export default function ProfilePage() {
-  const { user, loading, logout } = useAuthContext();
+  const { user, loading, logout, setUser } = useAuthContext();
   const router = useRouter();
 
   // Protect Route
@@ -165,7 +283,7 @@ export default function ProfilePage() {
       description="Manage your account and preferences."
       maxWidth="4xl"
     >
-      <ProfileForm user={user} logout={logout} />
+      <ProfileForm user={user} logout={logout} setUser={setUser} />
     </DashboardLayout>
   );
 }

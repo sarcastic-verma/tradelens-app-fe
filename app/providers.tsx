@@ -7,6 +7,7 @@ import { LoadingContextProvider } from "@/state/context/loading.context";
 import { AlertContextProvider } from "@/state/context/alert.context";
 import { ThemeProvider } from "@/state/context/theme.context";
 import { Alert } from "@/components/common/alert";
+import { OnboardingGuard } from "@/components/auth/onboarding-guard";
 
 interface ProvidersProps {
   children: React.ReactNode;
@@ -20,6 +21,7 @@ export function Providers({ children, initialTheme = "dark" }: ProvidersProps) {
         <AlertContextProvider>
           <AuthContextProvider>
             <Alert />
+            <OnboardingGuard />
             {children}
           </AuthContextProvider>
         </AlertContextProvider>

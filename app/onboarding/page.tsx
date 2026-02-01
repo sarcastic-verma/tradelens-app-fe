@@ -1,123 +1,225 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthContext } from "@/state/context/auth.context";
+import { UserRepository } from "@/repositories/users/user.repository";
+import { Upload, Camera, Loader2 } from "lucide-react";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 
 export default function OnboardingPage() {
-  const { user, loading } = useAuthContext();
+  const { user, loading, setUser } = useAuthContext();
   const router = useRouter();
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [profilePicFile, setProfilePicFile] = useState<File | null>(null);
+  const [profilePicPreview, setProfilePicPreview] = useState<string | null>(
+    null,
+  );
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (!loading && !user) {
-      router.replace("/");
+    if (!loading && user) {
+      if (user.name) {
+        // User already has a name, redirect to home
+        router.replace("/");
+        return;
+      }
+      // Prefill if available
+      if (user.phone) setPhone(user.phone);
     }
   }, [user, loading, router]);
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setProfilePicFile(file);
+      const objectUrl = URL.createObjectURL(file);
+      setProfilePicPreview(objectUrl);
+    }
+  };
+
+  const handleSkip = () => {
+    sessionStorage.setItem("onboarding_skipped", "true");
+    router.push("/");
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) return;
+    if (!name.trim()) return;
+
+    setIsSubmitting(true);
+    try {
+      let finalProfilePic = user.profilePic;
+
+      // 1. Upload Image to S3 if selected
+      if (profilePicFile) {
+        const { data: presigned } = await UserRepository.getPresignedUrl(
+          profilePicFile.type,
+        );
+
+        await fetch(presigned.url, {
+          method: "PUT",
+          body: profilePicFile,
+          headers: {
+            "Content-Type": profilePicFile.type,
+          },
+        });
+
+        // Construct the URL using the returned key
+        // Assuming public bucket or CDN.
+        finalProfilePic = `https://tradelens-s3.s3.ap-south-1.amazonaws.com/${presigned.key}`;
+      }
+
+      // 2. Update User
+      const { data: updatedUser } = await UserRepository.updateMe({
+        name,
+        phone,
+        profilePic: finalProfilePic,
+      });
+
+      setUser(updatedUser);
+      router.push("/");
+    } catch (error) {
+      console.error("Failed to update profile", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500" />
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="h-10 w-10 text-primary animate-spin" />
       </div>
     );
   }
 
-  if (!user) {
-    return null;
-  }
+  if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-black">      
-      <main className="pt-24 pb-16 px-6">
-        <div className="max-w-2xl mx-auto">
-          <div className="text-center mb-10">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Welcome to TradeLens! 🎉
-            </h1>
-            <p className="text-lg text-zinc-400">
-              Let&apos;s get your account set up in just a few steps.
-            </p>
-          </div>
+    <div className="min-h-screen w-full relative overflow-hidden flex items-center justify-center p-4">
+      {/* Background Orbs matching DashboardLayout */}
+      <div className="absolute top-20 right-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl pointer-events-none animate-float" />
+      <div
+        className="absolute bottom-0 left-0 w-64 h-64 bg-success/5 rounded-full blur-3xl pointer-events-none animate-float"
+        style={{ animationDelay: "2s" }}
+      />
 
-          <div className="space-y-6">
-            <OnboardingStep
-              step={1}
-              title="Complete Your Profile"
-              description="Add your name and profile photo so others can identify you."
-              status="current"
-            />
+      <Card className="max-w-md w-full glass-card animate-fade-in shadow-elevated border-border/50">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none" />
 
-            <OnboardingStep
-              step={2}
-              title="Choose Your Interests"
-              description="Select the instruments and strategies you're interested in."
-              status="pending"
-            />
+        <CardHeader className="text-center relative z-10 space-y-2 pb-6">
+          <CardTitle className="text-3xl font-bold tracking-tight">
+            Welcome to <span className="text-gradient-primary">TradeLens</span>
+          </CardTitle>
+          <CardDescription className="text-base text-muted-foreground">
+            Let&apos;s customize your profile to get started.
+          </CardDescription>
+        </CardHeader>
 
-            <OnboardingStep
-              step={3}
-              title="Follow Creators"
-              description="Discover and follow verified creators to see their trades."
-              status="pending"
-            />
-          </div>
+        <CardContent className="relative z-10 space-y-8">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Profile Picture Upload */}
+            <div className="flex flex-col items-center gap-4">
+              <div
+                className="relative w-28 h-28 rounded-full bg-secondary/30 border-2 border-dashed border-border flex items-center justify-center cursor-pointer overflow-hidden group hover:border-primary transition-all duration-300 shadow-lg"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                {profilePicPreview || user.profilePic ? (
+                  <Image
+                    src={profilePicPreview || user.profilePic || ""}
+                    alt="Profile"
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                ) : (
+                  <Camera className="w-10 h-10 text-muted-foreground group-hover:text-primary transition-colors duration-300" />
+                )}
 
-          <div className="mt-10 flex justify-center">
-            <button
-              onClick={() => router.push("/")}
-              className="px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-medium rounded-full transition-all duration-200 shadow-lg shadow-indigo-500/25"
-            >
-              Continue to Dashboard
-            </button>
-          </div>
-        </div>
-      </main>
-    </div>
-  );
-}
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <Upload className="w-8 h-8 text-white drop-shadow-md" />
+                </div>
+              </div>
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                accept="image/*"
+                className="hidden"
+              />
+              <p className="text-xs font-medium text-muted-foreground bg-secondary/50 px-3 py-1 rounded-full">
+                Tap to upload photo
+              </p>
+            </div>
 
-function OnboardingStep({
-  step,
-  title,
-  description,
-  status,
-}: {
-  step: number;
-  title: string;
-  description: string;
-  status: "completed" | "current" | "pending";
-}) {
-  const borderColor =
-    status === "completed"
-      ? "border-green-500"
-      : status === "current"
-        ? "border-indigo-500"
-        : "border-zinc-700";
+            {/* Form Fields */}
+            <div className="space-y-5">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground ml-1">
+                  Full Name <span className="text-danger">*</span>
+                </label>
+                <Input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="e.g. John Doe"
+                  className="bg-secondary/30 border-border/50 focus:border-primary/50 focus:ring-primary/20 h-12 text-lg"
+                  required
+                />
+              </div>
 
-  const bgColor = status === "current" ? "bg-zinc-900/80" : "bg-zinc-900/30";
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground ml-1">
+                  Phone Number
+                </label>
+                <Input
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="+91 9876543210"
+                  className="bg-secondary/30 border-border/50 focus:border-primary/50 focus:ring-primary/20 h-12 text-lg"
+                />
+              </div>
+            </div>
 
-  return (
-    <div
-      className={`p-6 rounded-2xl border ${borderColor} ${bgColor} transition-colors`}
-    >
-      <div className="flex items-start gap-4">
-        <div
-          className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${
-            status === "completed"
-              ? "bg-green-500 text-white"
-              : status === "current"
-                ? "bg-indigo-500 text-white"
-                : "bg-zinc-700 text-zinc-400"
-          }`}
-        >
-          {status === "completed" ? "✓" : step}
-        </div>
+            {/* Actions */}
+            <div className="pt-4 space-y-3">
+              <Button
+                type="submit"
+                disabled={isSubmitting || !name.trim()}
+                className="w-full h-12 text-base font-semibold shadow-glow-primary transition-all hover:scale-[1.02] active:scale-[0.98]"
+              >
+                {isSubmitting ? (
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                ) : (
+                  "Save & Continue"
+                )}
+              </Button>
 
-        <div>
-          <h3 className="text-lg font-semibold text-white mb-1">{title}</h3>
-          <p className="text-zinc-400 text-sm">{description}</p>
-        </div>
-      </div>
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={handleSkip}
+                className="w-full text-muted-foreground hover:text-foreground"
+              >
+                Skip for now
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 }

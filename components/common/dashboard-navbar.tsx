@@ -55,9 +55,9 @@ export function DashboardNavbar() {
         <div className="flex items-center gap-4 mr-1">
           {!loading && user && (
             <Link href="/profile" title="Go to Profile">
-              {user.photo ? (
+              {user.profilePic ? (
                 <Image
-                  src={user.photo}
+                  src={user.profilePic}
                   alt={user.name || "User"}
                   width={36}
                   height={36}

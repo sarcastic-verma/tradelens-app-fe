@@ -18,4 +18,13 @@ export class UserRepository {
       { headers: { Authorization: `Bearer ${token}` } },
     );
   }
+
+  static getPresignedUrl(mimeType: string) {
+    return axiosInstance.get<{ url: string; key: string }>(
+      "/api/users/presigned-url",
+      {
+        params: { mimeType },
+      },
+    );
+  }
 }

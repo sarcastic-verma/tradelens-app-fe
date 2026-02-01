@@ -60,9 +60,9 @@ export function MobileNavbar() {
                 : "text-muted-foreground hover:text-foreground active:scale-95",
             )}
           >
-            {user?.photo ? (
+            {user?.profilePic ? (
               <Image
-                src={user.photo}
+                src={user.profilePic}
                 alt={user.name || "Profile"}
                 width={20}
                 height={20}
