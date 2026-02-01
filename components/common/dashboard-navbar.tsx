@@ -2,10 +2,19 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { useAuthContext } from "@/state/context/auth.context";
+import { dashboardNavItems } from "@/config/navigation";
+import { cn } from "@/lib/utils";
 
 export function DashboardNavbar() {
+  const pathname = usePathname();
   const { user, loading } = useAuthContext();
+
+  const isActiveRoute = (href: string) => {
+    if (href === "/") return pathname === "/";
+    return pathname === href || pathname.startsWith(href + "/");
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 hidden md:flex flex-col items-center pt-4 px-4 bg-transparent pointer-events-none">
@@ -25,24 +34,22 @@ export function DashboardNavbar() {
 
         {/* Dashboard Links */}
         <div className="hidden md:flex items-center gap-6 text-sm font-medium text-muted-foreground">
-          <Link
-            href="/creators"
-            className="hover:text-foreground transition-colors hover:text-primary"
-          >
-            Creators
-          </Link>
-          <Link
-            href="/trades"
-            className="hover:text-foreground transition-colors hover:text-primary"
-          >
-            Trades
-          </Link>
-          <Link
-            href="/my-performance"
-            className="hover:text-foreground transition-colors hover:text-primary"
-          >
-            My Performance
-          </Link>
+          {dashboardNavItems
+            .filter((item) => item.href !== "/")
+            .map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "transition-colors hover:text-primary",
+                  isActiveRoute(item.href)
+                    ? "text-primary"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {item.label}
+              </Link>
+            ))}
         </div>
 
         <div className="flex items-center gap-4 mr-1">
