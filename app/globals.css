@@ -1,26 +1,317 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@theme {
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+
+  --color-success: hsl(var(--success));
+  --color-success-foreground: hsl(var(--success-foreground));
+
+  --color-danger: hsl(var(--danger));
+  --color-danger-foreground: hsl(var(--danger-foreground));
+
+  --color-warning: hsl(var(--warning));
+  --color-warning-foreground: hsl(var(--warning-foreground));
+  
+  --radius: var(--radius);
+
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+  --animate-shimmer: shimmer 3s infinite linear;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-pulse-glow: pulse-glow 3s ease-in-out infinite;
+  --animate-slide-up: slide-up 0.6s ease-out forwards;
+  --animate-fade-in: fade-in 0.4s ease-out forwards;
+
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+  @keyframes pulse-glow {
+    0%, 100% {
+      opacity: 0.6;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+  @keyframes slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@utility container {
+  margin-inline: auto;
+  padding-inline: 2rem;
+  @media (width >= --theme(--breakpoint-sm)) {
+    max-width: none;
+  }
+  @media (width >= 1400px) {
+    max-width: 1400px;
+  }
+}
+
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to sure everything still looks the same.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+}
+
+:root {
+  /* Dark fintech palette - institutional hedge fund feel */
+  --background: 230 25% 5%;
+  --foreground: 210 20% 95%;
+
+  --card: 230 20% 8%;
+  --card-foreground: 210 20% 95%;
+  --card-elevated: 230 20% 10%;
+
+  --popover: 230 20% 8%;
+  --popover-foreground: 210 20% 95%;
+
+  /* Electric blue primary - institutional feel */
+  --primary: 210 100% 55%;
+  --primary-foreground: 230 25% 5%;
+  --primary-glow: 210 100% 60%;
+
+  /* Navy secondary */
+  --secondary: 220 30% 15%;
+  --secondary-foreground: 210 20% 90%;
+
+  /* Muted tones */
+  --muted: 230 15% 20%;
+  --muted-foreground: 220 10% 55%;
+
+  /* Accent - subtle blue highlight */
+  --accent: 215 80% 25%;
+  --accent-foreground: 210 20% 95%;
+
+  /* Success green - for wins and positive metrics */
+  --success: 145 70% 45%;
+  --success-foreground: 145 90% 95%;
+  --success-glow: 145 70% 50%;
+
+  /* Danger red - for losses */
+  --danger: 0 65% 50%;
+  --danger-foreground: 0 0% 100%;
+
+  /* Warning amber */
+  --warning: 38 90% 55%;
+  --warning-foreground: 38 10% 10%;
+
+  --destructive: 0 65% 50%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 220 20% 18%;
+  --input: 220 20% 15%;
+  --ring: 210 100% 55%;
+
+  --radius: 0.75rem;
+
+  /* Gradients */
+  --gradient-dark: linear-gradient(180deg, hsl(230 25% 5%) 0%, hsl(230 30% 3%) 100%);
+  --gradient-card: linear-gradient(135deg, hsl(230 20% 10%) 0%, hsl(230 25% 6%) 100%);
+  --gradient-glow: linear-gradient(135deg, hsl(210 100% 55% / 0.15) 0%, hsl(145 70% 45% / 0.1) 100%);
+  --gradient-hero: radial-gradient(ellipse at 30% 0%, hsl(210 100% 55% / 0.12) 0%, transparent 60%);
+
+  /* Shadows */
+  --shadow-glow-primary: 0 0 60px hsl(210 100% 55% / 0.2);
+  --shadow-glow-success: 0 0 30px hsl(145 70% 45% / 0.3);
+  --shadow-card: 0 4px 24px hsl(230 50% 3% / 0.5);
+  --shadow-elevated: 0 8px 40px hsl(230 50% 2% / 0.6);
+}
+
+.light {
+  /* Light mode - clean professional feel */
+  --background: 210 30% 98%;
+  --foreground: 230 25% 10%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 230 25% 10%;
+  --card-elevated: 210 20% 97%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 230 25% 10%;
+
+  --primary: 210 100% 45%;
+  --primary-foreground: 0 0% 100%;
+  --primary-glow: 210 100% 50%;
+
+  --secondary: 210 20% 93%;
+  --secondary-foreground: 230 25% 15%;
+
+  --muted: 210 15% 92%;
+  --muted-foreground: 220 10% 40%;
+
+  --accent: 210 60% 90%;
+  --accent-foreground: 210 100% 35%;
+
+  --success: 145 70% 35%;
+  --success-foreground: 0 0% 100%;
+  --success-glow: 145 70% 40%;
+
+  --danger: 0 65% 45%;
+  --danger-foreground: 0 0% 100%;
+
+  --warning: 38 90% 45%;
+  --warning-foreground: 38 10% 10%;
+
+  --destructive: 0 65% 45%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 210 20% 88%;
+  --input: 210 20% 92%;
+  --ring: 210 100% 45%;
+
+  /* Light mode gradients */
+  --gradient-dark: linear-gradient(180deg, hsl(210 30% 98%) 0%, hsl(210 25% 95%) 100%);
+  --gradient-card: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(210 20% 98%) 100%);
+  --gradient-glow: linear-gradient(135deg, hsl(210 100% 45% / 0.08) 0%, hsl(145 70% 35% / 0.06) 100%);
+  --gradient-hero: radial-gradient(ellipse at 30% 0%, hsl(210 100% 45% / 0.08) 0%, transparent 60%);
+
+  /* Light mode shadows */
+  --shadow-glow-primary: 0 0 40px hsl(210 100% 45% / 0.15);
+  --shadow-glow-success: 0 0 20px hsl(145 70% 35% / 0.2);
+  --shadow-card: 0 2px 16px hsl(210 30% 30% / 0.08);
+  --shadow-elevated: 0 4px 24px hsl(210 30% 30% / 0.12);
+}
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+}
+
+@layer utilities {
+  .text-gradient-primary {
+    @apply bg-gradient-to-r from-primary to-[hsl(var(--success))] bg-clip-text text-transparent;
+  }
+
+  .glow-primary {
+    box-shadow: var(--shadow-glow-primary);
+  }
+
+  .glow-success {
+    box-shadow: var(--shadow-glow-success);
+  }
+
+  .card-gradient {
+    background: var(--gradient-card);
+  }
+
+  .hero-glow {
+    background: var(--gradient-hero);
+  }
+  
+  .glass-card {
+    @apply bg-card/80 backdrop-blur-xl border border-border/50;
+  }
+
+  .metric-positive {
+    @apply text-[hsl(var(--success))] font-semibold;
+  }
+
+  .metric-negative {
+    @apply text-[hsl(var(--danger))] font-semibold;
+  }
+
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Staggered animations */
+  .stagger-1 { animation-delay: 0.1s; }
+  .stagger-2 { animation-delay: 0.2s; }
+  .stagger-3 { animation-delay: 0.3s; }
+  .stagger-4 { animation-delay: 0.4s; }
+  .stagger-5 { animation-delay: 0.5s; }
+
+  .bg-grid-pattern {
+    background-image: linear-gradient(to right, hsl(var(--border) / 0.3) 1px, transparent 1px), linear-gradient(to bottom, hsl(var(--border) / 0.3) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
 }

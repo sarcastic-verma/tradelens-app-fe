@@ -8,11 +8,15 @@ import { useAuthContext } from "@/state/context/auth.context";
 import { useLoading } from "@/state/context/loading.context";
 import AppleLogo from "@/public/icons/apple-logo.svg";
 import GoogleLogo from "@/public/icons/google-logo.svg";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export const SocialButton = ({
   authType,
+  onSuccess,
 }: {
   authType: "Google" | "Apple";
+  onSuccess?: () => void;
 }) => {
   const { setUser, firebaseUser } = useAuthContext();
   const { setLoading } = useLoading();
@@ -22,26 +26,36 @@ export const SocialButton = ({
 
   const authLogo = authType === "Google" ? GoogleLogo : AppleLogo;
 
-  return (
-    <button
-      type="button"
-      onClick={async () => {
-        console.log("clicked");
-        const exists = await authFxn(firebaseUser, router, setUser, setLoading);
+  const handleAuth = async () => {
+    const exists = await authFxn(firebaseUser, router, setUser, setLoading);
 
-        console.log("exists", exists);
-        // router.push(exists ? "/" : "/onboarding");
-      }}
-      className="flex items-center justify-center w-[70%] p-2 bg-white rounded-3xl focus:outline-none hover:ring-1 hover:ring-gray-700"
+    if (onSuccess) onSuccess();
+
+    if (!exists) {
+      router.push("/onboarding");
+    }
+  };
+
+  return (
+    <Button
+      variant="outline"
+      onClick={handleAuth}
+      className={cn(
+        "w-full flex items-center justify-center gap-3 py-6 text-base font-medium transition-all duration-300 group",
+        authType === "Apple"
+          ? "border-black/20 hover:bg-muted/50 dark:bg-white/90 dark:text-black dark:hover:bg-white dark:border-transparent"
+          : "border-border/60 hover:bg-muted/50",
+      )}
     >
       <Image
-        alt=""
-        height={25}
+        alt={`${authType} logo`}
+        height={20}
+        width={20}
         priority
-        className="mr-1 sm:mr-3"
+        className="group-hover:scale-110 transition-transform duration-300"
         src={authLogo}
       />
-      <div className="text-black text-sm"> Continue with {authType}</div>
-    </button>
+      <span>Continue with {authType}</span>
+    </Button>
   );
 };

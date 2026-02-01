@@ -1,16 +1,13 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import {
-  getAuth,
-  onAuthStateChanged,
-  User,
-} from "firebase/auth";
+import React, { useState } from "react";
+import { getAuth, onAuthStateChanged, User } from "firebase/auth";
 
 import { Loading } from "@/components/common/loading";
 import { firebaseApp } from "@/firebase/config";
 import { BackendUser } from "@/types";
 import { UserRepository } from "@/repositories/users/user.repository";
+import { logout as firebaseLogout } from "@/firebase/auth/common";
 
 const auth = getAuth(firebaseApp);
 
@@ -19,11 +16,13 @@ export const AuthContext = React.createContext<{
   user: BackendUser | null;
   loading: boolean;
   setUser: React.Dispatch<React.SetStateAction<BackendUser | null>>;
+  logout: () => Promise<void>;
 }>({
   firebaseUser: null,
   loading: false,
   user: null,
   setUser: () => {},
+  logout: async () => {},
 });
 
 export const useAuthContext = () => React.useContext(AuthContext);
@@ -41,22 +40,30 @@ export const AuthContextProvider = ({
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         setFirebaseUser(firebaseUser);
+        try {
+          const user = await UserRepository.getMe();
+          setUser(user.data);
+        } catch (error) {
+          console.error("Failed to fetch user profile", error);
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        setFirebaseUser(null);
+        setUser(null);
+        setLoading(false);
       }
-
-      setLoading(false);
     });
 
     return () => unsubscribe();
   }, []);
 
-  useEffect(() => {
-    (async () => {
-      if (user === null && !!firebaseUser) {
-        const user = await UserRepository.getMe();
-        setUser(user.data);
-      }
-    })();
-  }, [firebaseUser, user]);
+  const logout = async () => {
+    setLoading(true);
+    await firebaseLogout(setUser);
+    setFirebaseUser(null);
+    setLoading(false);
+  };
 
   return (
     <AuthContext.Provider
@@ -65,6 +72,7 @@ export const AuthContextProvider = ({
         loading,
         user,
         setUser,
+        logout,
       }}
     >
       {loading ? <Loading /> : children}
