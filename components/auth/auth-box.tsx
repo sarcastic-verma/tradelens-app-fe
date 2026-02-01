@@ -1,10 +1,24 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
 import { SocialButton } from "@/components/auth/social-button";
+import { useAuthContext } from "@/state/context/auth.context";
 
 export const AuthBox = ({ onSuccess }: { onSuccess?: () => void }) => {
   const router = useRouter();
+  const { firebaseUser } = useAuthContext();
+
+  if (firebaseUser) {
+    return (
+      <div className="flex flex-col items-center justify-center w-full max-w-sm mx-auto py-8 px-4 text-center space-y-4 animate-fade-in">
+        <Loader2 className="h-10 w-10 text-primary animate-spin" />
+        <p className="text-muted-foreground font-medium">
+          Resolving secure session...
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col items-center justify-center w-full max-w-sm mx-auto py-8 px-4 text-center">

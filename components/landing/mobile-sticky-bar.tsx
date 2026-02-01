@@ -37,7 +37,7 @@ export const MobileStickyBar = ({ onLoginClick }: MobileStickyBarProps) => {
             Join 100+ traders
           </p>
           <p className="text-xs text-muted-foreground truncate">
-            Get early access to verified traders
+            Get access to verified traders
           </p>
         </div>
 

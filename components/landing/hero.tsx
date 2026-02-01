@@ -8,7 +8,6 @@ import {
   CheckCircle2,
   User,
 } from "lucide-react";
-import { FloatingParticles } from "./floating-particles";
 import { useParallax } from "@/hooks/use-parallax";
 
 interface HeroProps {
@@ -21,11 +20,6 @@ export const Hero = ({ onLoginClick }: HeroProps) => {
 
   return (
     <section className="relative min-h-screen pt-28 sm:pt-32 md:pt-40 pb-12 sm:pb-16 px-4 overflow-hidden flex items-start sm:items-center">
-      {/* Background effects */}
-      <div className="absolute inset-0 hero-glow" />
-      <div className="absolute inset-0 bg-grid-pattern opacity-20" />
-      <FloatingParticles />
-
       {/* Floating orbs with parallax - hidden on small mobile */}
       <div
         className="absolute top-1/4 left-1/4 w-48 sm:w-64 md:w-96 h-48 sm:h-64 md:h-96 bg-primary/10 rounded-full blur-3xl animate-pulse-glow hidden sm:block"

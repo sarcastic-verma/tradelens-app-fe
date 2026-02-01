@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { cookies } from "next/headers";
 import "./globals.css";
 import { Providers } from "./providers";
+import { FloatingParticles } from "@/components/landing/floating-particles";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,7 +34,14 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Providers initialTheme={theme}>{children}</Providers>
+        <Providers initialTheme={theme}>
+          <div className="fixed inset-0 z-[-1] pointer-events-none">
+            <div className="absolute inset-0 hero-glow opacity-60" />
+            <div className="absolute inset-0 bg-grid-pattern opacity-[0.15]" />
+            <FloatingParticles />
+          </div>
+          {children}
+        </Providers>
       </body>
     </html>
   );

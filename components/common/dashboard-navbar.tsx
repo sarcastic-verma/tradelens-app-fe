@@ -23,8 +23,8 @@ export function DashboardNavbar() {
           </div>
         </div>
 
-        {/* Placeholder for Dashboard Links */}
-        <div className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
+        {/* Dashboard Links */}
+        <div className="hidden md:flex items-center gap-6 text-sm font-medium text-muted-foreground">
           <Link
             href="/creators"
             className="hover:text-foreground transition-colors hover:text-primary"
@@ -36,6 +36,12 @@ export function DashboardNavbar() {
             className="hover:text-foreground transition-colors hover:text-primary"
           >
             Trades
+          </Link>
+          <Link
+            href="/my-performance"
+            className="hover:text-foreground transition-colors hover:text-primary"
+          >
+            My Performance
           </Link>
         </div>
 
