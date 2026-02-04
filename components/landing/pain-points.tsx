@@ -20,7 +20,8 @@ export const PainPoints = () => {
               Tired of getting trapped in fake trading groups?
             </h2>
             <p className="text-base md:text-lg text-muted-foreground">
-              Here's what most Telegram "gurus" don't want you to know.
+              Here&apos;s what most Telegram &quot;gurus&quot; don&apos;t want
+              you to know.
             </p>
           </div>
         </ScrollReveal>
@@ -41,7 +42,7 @@ export const PainPoints = () => {
               <div className="inline-flex items-center gap-2 bg-danger/10 border border-danger/20 rounded-full px-3 py-1.5 mb-6">
                 <X size={12} className="text-danger" />
                 <span className="text-xs font-semibold text-danger tracking-wider">
-                  Random "Tips" Channel
+                  Random &quot;Tips&quot; Channel
                 </span>
               </div>
               <ul className="space-y-4">

@@ -95,36 +95,36 @@ export const Trust = () => {
                 <div className="space-y-1 sm:space-y-2 text-muted-foreground">
                   <div className="opacity-50">{"{"}</div>
                   <div className="pl-2 sm:pl-4">
-                    <span className="text-purple-400">"event_id"</span>:{" "}
-                    <span className="text-success">"evt_88392"</span>,
+                    <span className="text-purple-400">&quot;event_id&quot;</span>:{" "}
+                    <span className="text-success">&quot;evt_88392&quot;</span>,
                   </div>
                   <div className="pl-2 sm:pl-4">
-                    <span className="text-purple-400">"creator_id"</span>:{" "}
-                    <span className="text-success">"cr_theta"</span>,
+                    <span className="text-purple-400">&quot;creator_id&quot;</span>:{" "}
+                    <span className="text-success">&quot;cr_theta&quot;</span>,
                   </div>
                   <div className="pl-2 sm:pl-4">
-                    <span className="text-purple-400">"trade_idea"</span>: {"{"}
+                    <span className="text-purple-400">&quot;trade_idea&quot;</span>: {"{"}
                   </div>
                   <div className="pl-4 sm:pl-8">
-                    <span className="text-purple-400">"ticker"</span>:{" "}
-                    <span className="text-yellow-200">"BANKNIFTY"</span>,
+                    <span className="text-purple-400">&quot;ticker&quot;</span>:{" "}
+                    <span className="text-yellow-200">&quot;BANKNIFTY&quot;</span>,
                   </div>
                   <div className="pl-4 sm:pl-8">
-                    <span className="text-purple-400">"entry"</span>:{" "}
+                    <span className="text-purple-400">&quot;entry&quot;</span>:{" "}
                     <span className="text-blue-400">44500.00</span>,
                   </div>
                   <div className="pl-4 sm:pl-8">
-                    <span className="text-purple-400">"time"</span>:{" "}
-                    <span className="text-success">"09:15:00Z"</span>,
+                    <span className="text-purple-400">&quot;time&quot;</span>:{" "}
+                    <span className="text-success">&quot;09:15:00Z&quot;</span>,
                   </div>
                   <div className="pl-4 sm:pl-8">
-                    <span className="text-purple-400">"status"</span>:{" "}
-                    <span className="text-success">"VERIFIED"</span>
+                    <span className="text-purple-400">&quot;status&quot;</span>:{" "}
+                    <span className="text-success">&quot;VERIFIED&quot;</span>
                   </div>
                   <div className="pl-2 sm:pl-4">{"},"}</div>
                   <div className="pl-2 sm:pl-4">
-                    <span className="text-purple-400">"source"</span>:{" "}
-                    <span className="text-success">"NSE_REALTIME"</span>
+                    <span className="text-purple-400">&quot;source&quot;</span>:{" "}
+                    <span className="text-success">&quot;NSE_REALTIME&quot;</span>
                   </div>
                   <div className="opacity-50">{"}"}</div>
                 </div>

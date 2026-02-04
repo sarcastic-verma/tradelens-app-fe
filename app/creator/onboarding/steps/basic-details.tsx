@@ -45,14 +45,15 @@ export function BasicDetails({ data, updateData, onNext }: BasicDetailsProps) {
   };
 
   const isValid =
-    data.displayName?.trim().length > 0 && data.bio?.trim().length > 0;
+    (data?.displayName?.trim()?.length ?? 0) > 0 &&
+    (data?.bio?.trim()?.length ?? 0) > 0;
 
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="space-y-2 text-center">
         <h2 className="text-2xl font-bold">Tell us about yourself</h2>
         <p className="text-muted-foreground">
-          This is how you'll appear to your followers.
+          This is how you&apos;ll appear to your followers.
         </p>
       </div>
 

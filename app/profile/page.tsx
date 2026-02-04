@@ -74,11 +74,12 @@ export default function ProfilePage() {
     try {
       const { data: updatedCreator } = await CreatorRepository.getMyProfile();
       setCreator(updatedCreator);
-    } catch (err) {
-      console.error(
-        "Failed to refresh creator profile after verification",
-        err,
-      );
+    } catch {
+      toast({
+        title: "Error",
+        description: "Failed to refresh creator profile after verification.",
+        variant: "destructive",
+      });
     }
   };
 

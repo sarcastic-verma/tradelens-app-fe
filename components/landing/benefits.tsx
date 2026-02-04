@@ -126,7 +126,7 @@ export const Benefits = () => {
               <span className="text-gradient-primary">Everyone</span>
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto text-sm sm:text-base">
-              Whether you're sharing trade ideas or looking for proven
+              Whether you&apos;re sharing trade ideas or looking for proven
               strategies, TradeLens has you covered.
             </p>
           </div>

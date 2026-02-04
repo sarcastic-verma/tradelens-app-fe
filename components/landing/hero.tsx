@@ -40,7 +40,7 @@ export const Hero = ({ onLoginClick }: HeroProps) => {
             <div className="inline-flex items-center gap-2 bg-success/10 border border-success/20 rounded-full px-3 sm:px-4 py-1.5 sm:py-2 mb-4 sm:mb-6 animate-fade-in">
               <span className="w-1.5 sm:w-2 h-1.5 sm:h-2 rounded-full bg-success animate-pulse" />
               <span className="text-[10px] sm:text-xs text-success font-medium">
-                India's First Trade Creator Verification Platform
+                India&apos;s First Trade Creator Verification Platform
               </span>
             </div>
 
@@ -54,7 +54,7 @@ export const Hero = ({ onLoginClick }: HeroProps) => {
             </h1>
 
             <p className="text-sm sm:text-base md:text-lg text-muted-foreground mb-6 sm:mb-8 max-w-xl mx-auto lg:mx-0 animate-slide-up stagger-2">
-              Discover, compare and subscribe to India's top creators — with
+              Discover, compare and subscribe to India&apos;s top creators — with
               real accuracy tracking, SEBI verification badges, and community
               reviews.
             </p>
