@@ -5,8 +5,9 @@ import { getAuth, onAuthStateChanged, User } from "firebase/auth";
 
 import { Loading } from "@/components/common/loading";
 import { firebaseApp } from "@/firebase/config";
-import { BackendUser } from "@/types";
+import { BackendUser, Creator } from "@/types";
 import { UserRepository } from "@/repositories/users/user.repository";
+import { CreatorRepository } from "@/repositories/creators/creator.repository";
 import { logout as firebaseLogout } from "@/firebase/auth/common";
 
 const auth = getAuth(firebaseApp);
@@ -14,15 +15,19 @@ const auth = getAuth(firebaseApp);
 export const AuthContext = React.createContext<{
   firebaseUser: User | null;
   user: BackendUser | null;
+  creator: Creator | null;
   loading: boolean;
   setUser: React.Dispatch<React.SetStateAction<BackendUser | null>>;
+  setCreator: React.Dispatch<React.SetStateAction<Creator | null>>; // New
   logout: () => Promise<void>;
 }>({
   firebaseUser: null,
   loading: false,
   user: null,
+  creator: null,
   setUser: () => {},
-  logout: async () => {},
+  setCreator: () => {}, // New
+  logout: async () => {}, // New
 });
 
 export const useAuthContext = () => React.useContext(AuthContext);
@@ -34,6 +39,7 @@ export const AuthContextProvider = ({
 }) => {
   const [firebaseUser, setFirebaseUser] = useState<User | null>(null);
   const [user, setUser] = useState<BackendUser | null>(null);
+  const [creator, setCreator] = useState<Creator | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   React.useEffect(() => {
@@ -41,8 +47,19 @@ export const AuthContextProvider = ({
       if (firebaseUser) {
         setFirebaseUser(firebaseUser);
         try {
-          const user = await UserRepository.getMe();
-          setUser(user.data);
+          const userRes = await UserRepository.getMe();
+          const backendUser = userRes.data;
+          setUser(backendUser);
+
+          // Fetch Creator Profile if applicable
+          if (backendUser.role === "CREATOR") {
+            try {
+              const creatorRes = await CreatorRepository.getMyProfile();
+              setCreator(creatorRes.data);
+            } catch (err) {
+              console.error("Failed to fetch creator profile", err);
+            }
+          }
         } catch (error) {
           console.error("Failed to fetch user profile", error);
         } finally {
@@ -51,6 +68,7 @@ export const AuthContextProvider = ({
       } else {
         setFirebaseUser(null);
         setUser(null);
+        setCreator(null);
         setLoading(false);
       }
     });
@@ -71,7 +89,9 @@ export const AuthContextProvider = ({
         firebaseUser,
         loading,
         user,
+        creator,
         setUser,
+        setCreator, // New
         logout,
       }}
     >

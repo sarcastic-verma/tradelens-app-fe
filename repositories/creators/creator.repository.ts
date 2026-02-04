@@ -1,49 +1,56 @@
-import axios from "axios";
-import { Creator } from "../../types";
-import { PaginationDto } from "../../types/common";
+import { axiosInstance } from "@/utils/axios-instance";
 import {
-  CreateCreatorDto,
-  SetupPayoutDto,
-  UpdateCreatorDto,
-  VerifySebiOtpDto,
-} from "../../types/creators";
-import { axiosInstance } from "../../utils/axios-instance";
+  InstrumentEnum,
+  StrategyEnum,
+  RiskProfileEnum,
+  CapitalRequiredBucketEnum,
+} from "@/types/enums";
+
+export interface CreateCreatorDto {
+  displayName: string;
+  bio?: string;
+  photoUrl?: string;
+  instruments: InstrumentEnum[];
+  strategies: StrategyEnum[];
+  riskProfile: RiskProfileEnum;
+  capitalReq: CapitalRequiredBucketEnum;
+  sebiRegNo?: string;
+}
+
+export interface SetupPayoutDto {
+  accountHolderName: string;
+  accountNumber: string;
+  ifsc: string;
+}
+
+export interface VerifySebiOtpDto {
+  otp: string;
+}
 
 export class CreatorRepository {
-  static onboard(data: CreateCreatorDto) {
-    return axiosInstance.post<Creator>("/api/creators/onboard", data);
-  }
-
-  static list(pagination?: PaginationDto) {
-    return axios.get<Creator[]>("/api/creators", { params: pagination });
-  }
-
-  static getMyProfile() {
-    return axiosInstance.get<Creator>("/api/creators/me");
-  }
-
-  static getProfile(id: string) {
-    return axios.get<Creator>(`/api/creators/${id}`);
-  }
-
-  static updateProfile(data: UpdateCreatorDto) {
-    return axiosInstance.patch<Creator>("/api/creators/me", data);
+  static createCreator(data: CreateCreatorDto) {
+    return axiosInstance.post("/api/creators/onboard", data);
   }
 
   static setupPayout(data: SetupPayoutDto) {
-    return axiosInstance.post<Creator>("/api/creators/me/payout-setup", data);
+    return axiosInstance.post("/api/creators/me/payout-setup", data);
   }
 
   static initiateSebiVerification() {
-    return axiosInstance.post<{ message: string; maskedEmail: string }>(
-      "/api/creators/me/sebi-verification/initiate",
-    );
+    return axiosInstance.post("/api/creators/me/sebi-verification/initiate");
   }
 
-  static verifySebiOtp(data: VerifySebiOtpDto) {
-    return axiosInstance.post<{ message: string }>(
-      "/api/creators/me/sebi-verification/verify",
-      data,
-    );
+  static verifySebiOtp(otp: string) {
+    return axiosInstance.post("/api/creators/me/sebi-verification/verify", {
+      otp,
+    });
+  }
+
+  static getMyProfile() {
+    return axiosInstance.get("/api/creators/me");
+  }
+
+  static updateProfile(data: Partial<CreateCreatorDto>) {
+    return axiosInstance.patch("/api/creators/me", data);
   }
 }
